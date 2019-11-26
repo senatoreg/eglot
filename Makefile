@@ -23,7 +23,7 @@ all: compile
 # Compilation
 #
 %.elc: %.el
-	$(EMACS) -Q $(ELPADEPS) $(LOAD_PATH) --batch -f batch-byte-compile $<
+	$(EMACS) -Q $(LOAD_PATH) --batch -f batch-byte-compile $<
 
 compile: $(ELCFILES)
 
@@ -34,6 +34,8 @@ eglot-check: compile
 		$(ELPADEPS)						\
 		$(LOAD_PATH)						\
 		-l eglot						\
+		-l eglot-eclipse					\
+		-l eglot-pyls						\
 		-l eglot-tests						\
 		--eval '(setq ert-batch-backtrace-right-margin 200)'	\
 		--eval '(ert-run-tests-batch-and-exit (quote $(SELECTOR)))'

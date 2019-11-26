@@ -71,6 +71,8 @@
 (require 'filenotify)
 (require 'ert)
 (require 'array)
+(require 'eglot-eclipse)
+(require 'eglot-pyls)
 (defvar company-backends) ; forward-declare, but don't require company yet
 
 
@@ -82,7 +84,7 @@
   :group 'applications)
 
 (defvar eglot-server-programs '((rust-mode . (eglot-rls "rls"))
-                                (python-mode . ("pyls"))
+                                (python-mode . eglot--pyls-contact)
                                 ((js-mode
                                   typescript-mode)
                                  . ("javascript-typescript-stdio"))
@@ -2572,7 +2574,7 @@ If INTERACTIVE, prompt user for details."
            (repodir (if (file-directory-p repodir) repodir dir))
            (config
             (concat
-             repodir
+             (or (if eglot-eclipse-jdt-config-dir (expand-file-name eglot-eclipse-jdt-config-dir)) repodir)
              (cond
               ((string= system-type "darwin") "config_mac")
               ((string= system-type "windows-nt") "config_win")
@@ -2595,7 +2597,7 @@ If INTERACTIVE, prompt user for details."
       (unless (file-directory-p workspace)
         (make-directory workspace t))
       (cons 'eglot-eclipse-jdt
-            (list (executable-find "java")
+            (list (if eglot-eclipse-jdt-java-home (concat (expand-file-name eglot-eclipse-jdt-java-home) "/bin/java") (executable-find "java"))
                   "-Declipse.application=org.eclipse.jdt.ls.core.id1"
                   "-Dosgi.bundles.defaultStartLevel=4"
                   "-Declipse.product=org.eclipse.jdt.ls.core.product"
